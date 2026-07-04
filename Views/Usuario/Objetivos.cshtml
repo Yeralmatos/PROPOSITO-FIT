@@ -1,0 +1,579 @@
+﻿@using Microsoft.AspNetCore.Http
+@model List<PropositoFit.Models.Objetivo>
+
+@{
+    Layout = null;
+    var nombreUsuario = Context.Session.GetString("NombreUsuario") ?? "Usuario";
+
+    var objetivoActual = Model
+        .Where(o => o.Estado != "Completado")
+        .OrderByDescending(o => o.Id)
+        .FirstOrDefault();
+
+    var historial = Model
+        .Where(o => o.Estado == "Completado")
+        .OrderByDescending(o => o.Id)
+        .ToList();
+
+    int diasRestantes = 0;
+
+    if (objetivoActual != null)
+    {
+        diasRestantes = (objetivoActual.FechaMeta.Date - DateTime.Now.Date).Days;
+        if (diasRestantes < 0) diasRestantes = 0;
+    }
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>Mis Objetivos - PropósitoFit</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            background: #f4f6fb;
+            font-family: Arial, sans-serif;
+            color: #0f172a;
+        }
+
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background: #0f1b2d;
+            color: white;
+            position: fixed;
+            padding: 25px 18px;
+        }
+
+        .brand {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 35px;
+            text-align: center;
+        }
+
+            .brand span {
+                color: #35c433;
+            }
+
+        .menu-link {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            font-size: 17px;
+        }
+
+            .menu-link:hover,
+            .menu-link.active {
+                background: #35c433;
+                color: white;
+            }
+
+        .content {
+            margin-left: 250px;
+            padding: 35px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            height: 45px;
+            margin-bottom: 20px;
+        }
+
+        .header-row {
+            margin-bottom: 25px;
+        }
+
+            .header-row h2 {
+                font-size: 36px;
+                font-weight: 800;
+                margin-bottom: 5px;
+            }
+
+        .panel,
+        .objetivo-card {
+            background: white;
+            border-radius: 18px;
+            padding: 26px;
+            box-shadow: 0 8px 25px rgba(0,0,0,.07);
+            margin-bottom: 25px;
+        }
+
+        .objetivo-label {
+            color: #079235;
+            font-weight: 800;
+            font-size: 16px;
+        }
+
+        .circle-icon {
+            width: 105px;
+            height: 105px;
+            border-radius: 50%;
+            background: #e8f8ec;
+            color: #079235;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 52px;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-top: 22px;
+            margin-bottom: 22px;
+        }
+
+        .meta-item {
+            border-left: 1px solid #e5e7eb;
+            padding-left: 18px;
+        }
+
+            .meta-item:first-child {
+                border-left: none;
+                padding-left: 0;
+            }
+
+            .meta-item span {
+                display: block;
+                color: #64748b;
+                font-size: 14px;
+                margin-bottom: 4px;
+            }
+
+            .meta-item strong {
+                font-size: 17px;
+            }
+
+        .progress {
+            height: 10px;
+            border-radius: 50px;
+            background: #e5e7eb;
+        }
+
+        .progress-bar {
+            background: #079235;
+        }
+
+        .status-badge {
+            background: #e8f8ec;
+            color: #079235;
+            padding: 9px 15px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 35px 20px;
+        }
+
+            .empty-state i {
+                font-size: 55px;
+                color: #35c433;
+                margin-bottom: 15px;
+            }
+
+        .history-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr 100px;
+            align-items: center;
+            gap: 15px;
+            padding: 16px 0;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .history-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: #eef2ff;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin-right: 12px;
+        }
+
+        .btn {
+            border-radius: 10px;
+            padding: 10px 18px;
+            font-weight: 700;
+        }
+
+        .btn-success {
+            background: #22b922;
+            border-color: #22b922;
+        }
+
+        .modal-content {
+            border-radius: 18px;
+            border: none;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 10px;
+            padding: 11px 13px;
+        }
+
+        .descripcion-box {
+            display: none;
+            border-left: 5px solid #35c433;
+            background: #f0fff4;
+            padding: 14px;
+            border-radius: 10px;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="brand">Propósito<span>Fit</span></div>
+
+        <a href="/Usuario/Index" class="menu-link">🏠 Inicio</a>
+        <a href="/Usuario/Objetivos" class="menu-link active">🎯 Mis Objetivos</a>
+        <a href="/Usuario/Rutinas" class="menu-link">🏆 Rutinas</a>
+        <a href="/Usuario/Alimentacion" class="menu-link">🍎 Alimentación</a>
+        <a href="/Usuario/Progreso" class="menu-link">📈 Mi Progreso</a>
+        <a href="/Usuario/MiPerfil" class="menu-link">👤 Mi Perfil</a>
+        <a href="/Acceso/CerrarSesion" class="menu-link">🚪 Cerrar Sesión</a>
+    </div>
+
+    <div class="content">
+
+        <div class="topbar">
+            <strong>Hola, @nombreUsuario</strong>
+        </div>
+
+        @if (TempData["ErrorObjetivo"] != null)
+        {
+            <div class="alert alert-warning">
+                @TempData["ErrorObjetivo"]
+            </div>
+        }
+
+        <div class="header-row">
+            <h2>Mis Objetivos</h2>
+            <p class="text-muted mb-0">Gestiona tu objetivo principal y realiza seguimiento a tu progreso.</p>
+        </div>
+
+        @if (objetivoActual != null)
+        {
+            <div class="objetivo-card">
+
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div class="objetivo-label">● OBJETIVO ACTUAL</div>
+                    <span class="status-badge">● Activo</span>
+                </div>
+
+                <div class="row align-items-center">
+                    <div class="col-md-2">
+                        <div class="circle-icon">
+                            <i class="bi bi-bullseye"></i>
+                        </div>
+                    </div>
+
+                    <div class="col-md-10">
+                        <h2 class="fw-bold">@objetivoActual.TipoObjetivo</h2>
+                        <p class="text-muted">@objetivoActual.Descripcion</p>
+
+                        <div class="meta-grid">
+                            <div class="meta-item">
+                                <span>Meta</span>
+                                <strong class="text-success">@objetivoActual.MetaObjetivo</strong>
+                            </div>
+
+                            <div class="meta-item">
+                                <span>Fecha Inicio</span>
+                                <strong><i class="bi bi-calendar"></i> @objetivoActual.FechaInicio.ToShortDateString()</strong>
+                            </div>
+
+                            <div class="meta-item">
+                                <span>Fecha Meta</span>
+                                <strong><i class="bi bi-calendar-check"></i> @objetivoActual.FechaMeta.ToShortDateString()</strong>
+                            </div>
+
+                            <div class="meta-item">
+                                <span>Días restantes</span>
+                                <strong class="text-primary">@diasRestantes días</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="row align-items-center">
+                    <div class="col-md-2">
+                        <strong>Progreso Actual</strong>
+                        <h1 class="text-success fw-bold">@objetivoActual.Progreso%</h1>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="progress">
+                            <div class="progress-bar" style="width:@(objetivoActual.Progreso)%"></div>
+                        </div>
+                        <small class="text-muted">@objetivoActual.Progreso% completado</small>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="bg-light rounded-3 p-3 text-success fw-bold text-center">
+                            <i class="bi bi-graph-up-arrow"></i> ¡Vas por buen camino!
+                        </div>
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="d-flex justify-content-end gap-2 flex-wrap">
+                    <a href="/Usuario/Rutinas" class="btn btn-light">
+                        <i class="bi bi-trophy"></i> Ver Rutinas
+                    </a>
+
+                    <a href="/Usuario/Alimentacion" class="btn btn-light">
+                        <i class="bi bi-apple"></i> Ver Alimentación
+                    </a>
+
+                    <form asp-controller="Usuario" asp-action="CompletarObjetivo" method="post">
+                        <input type="hidden" name="id" value="@objetivoActual.Id" />
+                        <button type="submit" class="btn btn-success"
+                                onclick="return confirm('¿Deseas marcar este objetivo como completado?')">
+                            <i class="bi bi-check-circle"></i> Marcar como Completado
+                        </button>
+                    </form>
+
+                    <form asp-controller="Usuario" asp-action="EliminarObjetivo" method="post">
+                        <input type="hidden" name="id" value="@objetivoActual.Id" />
+                        <button type="submit" class="btn btn-outline-danger"
+                                onclick="return confirm('¿Deseas eliminar este objetivo?')">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="panel">
+                <div class="empty-state">
+                    <i class="bi bi-bullseye"></i>
+                    <h3 class="fw-bold">No tienes un objetivo activo</h3>
+                    <p class="text-muted">
+                        Crea tu objetivo principal para que el sistema pueda recomendarte rutinas y alimentación.
+                    </p>
+
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#nuevoObjetivoModal">
+                        Seleccionar Objetivo
+                    </button>
+                </div>
+            </div>
+        }
+
+        <div class="panel">
+            <h5 class="fw-bold mb-3">
+                <i class="bi bi-clock-history"></i> HISTORIAL DE OBJETIVOS
+            </h5>
+
+            @if (historial.Any())
+            {
+                <div class="history-row fw-bold text-muted">
+                    <div>Objetivo</div>
+                    <div>Fecha Inicio</div>
+                    <div>Fecha Meta</div>
+                    <div>Progreso Final</div>
+                    <div>Estado</div>
+                    <div>Acciones</div>
+                </div>
+
+                @foreach (var item in historial)
+                {
+                    <div class="history-row">
+                        <div class="d-flex align-items-center">
+                            <div class="history-icon">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
+
+                            <div>
+                                <strong>@item.TipoObjetivo</strong>
+                                <p class="text-muted mb-0">@item.Descripcion</p>
+                            </div>
+                        </div>
+
+                        <div>@item.FechaInicio.ToShortDateString()</div>
+                        <div>@item.FechaMeta.ToShortDateString()</div>
+
+                        <div>
+                            <strong class="text-primary">@item.Progreso%</strong>
+                            <div class="progress mt-1">
+                                <div class="progress-bar" style="width:@(item.Progreso)%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="badge bg-success">Completado</span>
+                        </div>
+
+                        <div>
+                            <form asp-controller="Usuario" asp-action="EliminarObjetivo" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@item.Id" />
+                                <button type="submit"
+                                        class="btn btn-sm btn-outline-danger"
+                                        onclick="return confirm('¿Deseas eliminar este objetivo del historial?')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="text-muted mb-0">Aún no tienes objetivos completados.</p>
+            }
+        </div>
+    </div>
+
+    <div class="modal fade" id="nuevoObjetivoModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <div>
+                        <h4 class="fw-bold mb-1">Nuevo Objetivo</h4>
+                        <p class="text-muted mb-0">Selecciona y configura tu objetivo principal.</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form asp-controller="Usuario" asp-action="CrearObjetivo" method="post">
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Objetivo Principal</label>
+
+                            <select name="TipoObjetivo" id="objetivoSelect" class="form-select" onchange="mostrarDescripcion()" required>
+                                <option value="">Seleccione un objetivo</option>
+                                <option value="Bajar de peso">Bajar de peso</option>
+                                <option value="Ganar músculo">Ganar músculo</option>
+                                <option value="Tonificar el cuerpo">Tonificar el cuerpo</option>
+                                <option value="Mejorar condición física">Mejorar condición física</option>
+                                <option value="Aumentar de peso">Aumentar de peso</option>
+                                <option value="Mantenerse en forma">Mantenerse en forma</option>
+                                <option value="Vida saludable">Vida saludable</option>
+                                <option value="Mejorar flexibilidad">Mejorar flexibilidad</option>
+                            </select>
+
+                            <div id="descripcionObjetivo" class="descripcion-box"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Descripción personal</label>
+                            <textarea name="Descripcion" class="form-control" rows="3"
+                                      placeholder="Ejemplo: Quiero bajar de peso y mejorar mi salud."></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-semibold">Fecha Inicio</label>
+                                <input type="date" name="FechaInicio" class="form-control" required />
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-semibold">Fecha Meta</label>
+                                <input type="date" name="FechaMeta" class="form-control" required />
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-semibold">Prioridad</label>
+                                <select name="Prioridad" class="form-select" required>
+                                    <option value="Baja">Baja</option>
+                                    <option value="Media" selected>Media</option>
+                                    <option value="Alta">Alta</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Meta específica</label>
+                            <input type="text" name="MetaObjetivo" class="form-control"
+                                   placeholder="Ejemplo: bajar 20 lb, ganar 10 lb, correr 5 km" />
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-lg"></i> Crear Objetivo
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function mostrarDescripcion() {
+            const objetivo = document.getElementById("objetivoSelect").value;
+            const caja = document.getElementById("descripcionObjetivo");
+
+            let texto = "";
+
+            switch (objetivo) {
+                case "Bajar de peso":
+                    texto = "Reducir peso corporal mediante ejercicios sencillos en casa y mejores hábitos alimenticios.";
+                    break;
+                case "Ganar músculo":
+                    texto = "Fortalecer el cuerpo y aumentar masa muscular usando rutinas en casa sin máquinas de gimnasio.";
+                    break;
+                case "Tonificar el cuerpo":
+                    texto = "Mejorar la forma del cuerpo, fortalecer músculos y mantener una apariencia más definida.";
+                    break;
+                case "Mejorar condición física":
+                    texto = "Aumentar energía, resistencia y capacidad para realizar actividades físicas diarias.";
+                    break;
+                case "Aumentar de peso":
+                    texto = "Subir de peso de forma saludable combinando alimentación adecuada y ejercicios de fortalecimiento.";
+                    break;
+                case "Mantenerse en forma":
+                    texto = "Conservar un estado físico saludable mediante rutinas moderadas y alimentación equilibrada.";
+                    break;
+                case "Vida saludable":
+                    texto = "Crear hábitos saludables relacionados con actividad física, alimentación, hidratación y descanso.";
+                    break;
+                case "Mejorar flexibilidad":
+                    texto = "Aumentar movilidad corporal mediante ejercicios suaves de estiramiento y recuperación.";
+                    break;
+            }
+
+            if (objetivo === "") {
+                caja.style.display = "none";
+                caja.innerHTML = "";
+            } else {
+                caja.style.display = "block";
+                caja.innerHTML = "<strong>Descripción:</strong> " + texto;
+            }
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
