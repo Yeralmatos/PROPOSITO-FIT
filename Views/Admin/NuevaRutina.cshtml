@@ -1,0 +1,120 @@
+﻿@model PropositoFit.Models.Rutina
+
+@{
+    ViewData["Title"] = "Nueva Rutina";
+}
+
+<style>
+    .card-form {
+        background: white;
+        border-radius: 18px;
+        padding: 30px;
+        box-shadow: 0 8px 25px rgba(0,0,0,.08);
+    }
+
+    .titulo {
+        font-weight: 800;
+        color: #111827;
+    }
+
+    label {
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+
+    .btn-guardar {
+        background: #16a34a;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 22px;
+    }
+
+        .btn-guardar:hover {
+            background: #15803d;
+        }
+
+    .btn-volver {
+        border-radius: 10px;
+        padding: 10px 22px;
+    }
+</style>
+
+<div class="card-form">
+
+    <h2 class="titulo mb-4">
+        <i class="bi bi-plus-circle-fill"></i>
+        Nueva Rutina
+    </h2>
+
+    <form asp-action="NuevaRutina" method="post">
+
+        <div class="row">
+
+            <div class="col-md-6 mb-3">
+                <label>Objetivo</label>
+
+                <select asp-for="ObjetivoId" class="form-select">
+
+                    <option value="">Seleccione...</option>
+
+                    @foreach (var objetivo in ViewBag.Objetivos)
+                    {
+                        <option value="@objetivo.Id">
+                            @objetivo.Nombre
+                        </option>
+                    }
+
+                </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label>Nivel</label>
+
+                <select asp-for="Nivel" class="form-select">
+                    <option>Principiante</option>
+                    <option>Intermedio</option>
+                    <option>Avanzado</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="mb-3">
+            <label>Nombre de la rutina</label>
+
+            <input asp-for="Nombre"
+                   class="form-control"
+                   placeholder="Ej. Fortalecimiento de rodillas" />
+        </div>
+
+        <div class="mb-3">
+            <label>Descripción</label>
+
+            <textarea asp-for="Descripcion"
+                      rows="3"
+                      class="form-control"></textarea>
+        </div>
+
+        <div class="mb-4">
+            <label>Instrucciones generales</label>
+
+            <textarea asp-for="Instrucciones"
+                      rows="5"
+                      class="form-control"
+                      placeholder="Escriba las recomendaciones para realizar la rutina..."></textarea>
+        </div>
+
+        <button class="btn-guardar">
+            <i class="bi bi-check-circle"></i>
+            Guardar Rutina
+        </button>
+
+        <a asp-action="Rutinas"
+           class="btn btn-secondary btn-volver">
+            Cancelar
+        </a>
+
+    </form>
+
+</div>

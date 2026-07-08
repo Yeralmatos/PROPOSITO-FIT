@@ -1,0 +1,338 @@
+﻿@using Microsoft.AspNetCore.Http
+
+@{
+    Layout = null;
+
+    var nombreUsuario = Context.Session.GetString("NombreUsuario") ?? "Usuario";
+
+    string objetivoActual = ViewBag.ObjetivoActual ?? "Sin objetivo";
+
+    int totalEjercicios = ViewBag.TotalEjercicios ?? 0;
+    int ejerciciosCompletados = ViewBag.EjerciciosCompletados ?? 0;
+    int ejerciciosRestantes = ViewBag.EjerciciosRestantes ?? 0;
+    int porcentaje = ViewBag.Porcentaje ?? 0;
+    int rutinasCompletadas = ViewBag.RutinasCompletadas ?? 0;
+    int totalRutinas = ViewBag.TotalRutinas ?? 0;
+    string ultimoEntrenamiento = ViewBag.UltimoEntrenamiento ?? "Sin registros";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>Mi Progreso - PropósitoFit</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            background: #f7f8fb;
+            font-family: Arial, sans-serif;
+            color: #111827;
+        }
+
+        .sidebar {
+            width: 240px;
+            height: 100vh;
+            position: fixed;
+            background: #071426;
+            color: white;
+            padding: 24px 16px;
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: 800;
+            margin-bottom: 38px;
+        }
+
+            .logo span {
+                color: #24c932;
+            }
+
+        .menu-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: white;
+            text-decoration: none;
+            padding: 14px 15px;
+            border-radius: 12px;
+            margin-bottom: 11px;
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+            .menu-link.active,
+            .menu-link:hover {
+                background: #10b62f;
+                color: white;
+            }
+
+        .content {
+            margin-left: 240px;
+            padding: 0 26px 28px;
+        }
+
+        .topbar {
+            height: 72px;
+            background: white;
+            margin: 0 -26px 20px;
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 12px rgba(0,0,0,.05);
+        }
+
+        .card-box {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 22px;
+            box-shadow: 0 6px 20px rgba(0,0,0,.04);
+        }
+
+        .objective-icon {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            background: #0ca52d;
+            color: white;
+            font-size: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            margin-bottom: 12px;
+        }
+
+        .progress {
+            height: 18px;
+            border-radius: 20px;
+        }
+
+        .progress-bar {
+            background: #0ca52d;
+        }
+
+        .measure-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 15px;
+            background: #fbfcff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="logo">Propósito<span>Fit</span></div>
+
+        <a href="/Usuario/Index" class="menu-link">🏠 Inicio</a>
+        <a href="/Usuario/Objetivos" class="menu-link">🎯 Mis Objetivos</a>
+        <a href="/Usuario/Rutinas" class="menu-link">🏋️ Rutinas</a>
+        <a href="/Usuario/Alimentacion" class="menu-link">🍎 Alimentación</a>
+        <a href="/Usuario/Progreso" class="menu-link active">📈 Mi Progreso</a>
+        <a href="/Usuario/MiPerfil" class="menu-link">👤 Mi Perfil</a>
+        <a href="/Acceso/CerrarSesion" class="menu-link">🚪 Cerrar Sesión</a>
+    </div>
+
+    <div class="content">
+
+        <div class="topbar">
+            <h3 class="fw-bold mb-0">
+                <i class="bi bi-list me-3"></i> Mi Progreso
+            </h3>
+
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-bell fs-4"></i>
+                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width:43px;height:43px;">
+                    <i class="bi bi-person-fill fs-4 text-secondary"></i>
+                </div>
+                <strong>Hola, @nombreUsuario</strong>
+            </div>
+        </div>
+
+        <div class="card-box mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-4">
+                    <div class="objective-icon">
+                        <i class="bi bi-fire"></i>
+                    </div>
+
+                    <div>
+                        <h5 class="text-success fw-bold mb-1">Objetivo actual</h5>
+                        <h2 class="fw-bold mb-1">@objetivoActual</h2>
+                        <p class="mb-0 text-muted">Tu avance se calcula según los ejercicios completados.</p>
+                    </div>
+                </div>
+
+                <div style="font-size:70px;">💪</div>
+            </div>
+        </div>
+
+        <div class="card-box mb-4">
+            <h4 class="fw-bold mb-4">Progreso general</h4>
+
+            <div class="row align-items-center">
+                <div class="col-md-3 text-center">
+                    <h1 class="fw-bold text-success">@porcentaje%</h1>
+                    <p class="text-muted">Completado</p>
+                </div>
+
+                <div class="col-md-9">
+                    <div class="row text-center mb-4">
+                        <div class="col-md-4">
+                            <h2 class="fw-bold">@ejerciciosCompletados</h2>
+                            <p class="text-muted mb-0">Ejercicios completados</p>
+                        </div>
+
+                        <div class="col-md-4">
+                            <h2 class="fw-bold">@ejerciciosRestantes</h2>
+                            <p class="text-muted mb-0">Ejercicios restantes</p>
+                        </div>
+
+                        <div class="col-md-4">
+                            <h2 class="fw-bold">@totalEjercicios</h2>
+                            <p class="text-muted mb-0">Total ejercicios</p>
+                        </div>
+                    </div>
+
+                    <div class="progress">
+                        <div class="progress-bar" style="width:@porcentaje%"></div>
+                    </div>
+
+                    <p class="mt-3 mb-0 text-success fw-bold">
+                        ⭐ ¡Vas muy bien! La disciplina de hoy construye los resultados de mañana.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="card-box">
+                    <div class="stat-icon" style="background:#e9fbe9;color:#0ca52d;">🏋️</div>
+                    <h2 class="fw-bold">@rutinasCompletadas</h2>
+                    <p class="mb-0">Rutinas completadas</p>
+                    <small class="text-success">de @totalRutinas asignadas</small>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card-box">
+                    <div class="stat-icon" style="background:#eef4ff;color:#2563eb;">✅</div>
+                    <h2 class="fw-bold">@ejerciciosCompletados</h2>
+                    <p class="mb-0">Ejercicios realizados</p>
+                    <small class="text-primary">avance actual</small>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card-box">
+                    <div class="stat-icon" style="background:#fff3e6;color:#f97316;">🔥</div>
+                    <h2 class="fw-bold">@porcentaje%</h2>
+                    <p class="mb-0">Progreso total</p>
+                    <small class="text-warning">según rutina</small>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card-box">
+                    <div class="stat-icon" style="background:#f3e8ff;color:#7e22ce;">📅</div>
+                    <h5 class="fw-bold">@ultimoEntrenamiento</h5>
+                    <p class="mb-0">Último entrenamiento</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-7">
+                <div class="card-box">
+                    <h4 class="fw-bold mb-3">Registrar avance físico</h4>
+                    <p class="text-muted">No solo registres peso. También puedes registrar medidas corporales según tu objetivo.</p>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="measure-card">
+                                <label class="form-label">Peso (kg)</label>
+                                <input type="number" class="form-control" placeholder="Ej: 78.4">
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="measure-card">
+                                <label class="form-label">Cintura (cm)</label>
+                                <input type="number" class="form-control" placeholder="Ej: 85">
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="measure-card">
+                                <label class="form-label">Abdomen (cm)</label>
+                                <input type="number" class="form-control" placeholder="Ej: 90">
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="measure-card">
+                                <label class="form-label">Bíceps (cm)</label>
+                                <input type="number" class="form-control" placeholder="Ej: 32">
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="measure-card">
+                                <label class="form-label">Tríceps (cm)</label>
+                                <input type="number" class="form-control" placeholder="Ej: 30">
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="measure-card">
+                                <label class="form-label">Glúteos (cm)</label>
+                                <input type="number" class="form-control" placeholder="Ej: 98">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-success mt-4 px-4">
+                        Guardar avance
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-md-5">
+                <div class="card-box">
+                    <h4 class="fw-bold mb-3">Resumen</h4>
+
+                    <p><strong>Objetivo:</strong> @objetivoActual</p>
+                    <p><strong>Rutinas completadas:</strong> @rutinasCompletadas de @totalRutinas</p>
+                    <p><strong>Ejercicios completados:</strong> @ejerciciosCompletados de @totalEjercicios</p>
+                    <p><strong>Último entrenamiento:</strong> @ultimoEntrenamiento</p>
+
+                    <div class="alert alert-success mt-3 mb-0">
+                        Consejo: registra tus medidas una vez por semana para ver mejor tu avance.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
+

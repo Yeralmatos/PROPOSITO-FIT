@@ -1,0 +1,187 @@
+﻿@using PropositoFit.Models
+@{
+    Layout = null;
+    var objetivo = ViewBag.Objetivo as Objetivo;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>Nuevo Objetivo - PropósitoFit</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #eef7f0, #f7f9fc);
+            font-family: Arial, sans-serif;
+            color: #111827;
+        }
+
+        .page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 35px 15px;
+        }
+
+        .modal-card {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 26px;
+            box-shadow: 0 25px 60px rgba(15, 23, 42, .16);
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 28px 34px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .content {
+            padding: 32px 34px;
+        }
+
+        .objective-box {
+            background: #ecfdf3;
+            border: 1px solid #bbf7d0;
+            border-radius: 18px;
+            padding: 22px;
+            display: flex;
+            gap: 18px;
+            align-items: flex-start;
+            margin-bottom: 25px;
+        }
+
+        .objective-icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 16px;
+            background: #16a34a;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            flex-shrink: 0;
+        }
+
+        .form-control, .form-select {
+            border-radius: 14px;
+            min-height: 54px;
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+        }
+
+        .footer {
+            padding: 22px 34px;
+            background: #f9fafb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn {
+            border-radius: 14px;
+            padding: 12px 24px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="page">
+        <div class="modal-card">
+
+            <div class="header">
+                <div>
+                    <h2 class="fw-bold mb-1">Nuevo Objetivo</h2>
+                    <p class="text-muted mb-0">Configura tu objetivo principal antes de ver las rutinas.</p>
+                </div>
+
+                <a href="/Usuario/Objetivos" class="btn btn-light">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+            </div>
+
+            <form asp-action="GuardarObjetivo" method="post">
+                <div class="content">
+
+                    <input type="hidden" name="ObjetivoId" value="@objetivo?.Id" />
+
+                    <label class="form-label fw-bold">Objetivo seleccionado</label>
+
+                    <div class="objective-box">
+                        <div class="objective-icon">
+                            <i class="bi bi-bullseye"></i>
+                        </div>
+
+                        <div>
+                            <h4 class="fw-bold mb-1">@objetivo?.Nombre</h4>
+                            <p class="text-muted mb-0">@objetivo?.Descripcion</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Descripción personal</label>
+                        <textarea name="DescripcionPersonal"
+                                  class="form-control"
+                                  placeholder="Ejemplo: Quiero bajar de peso, sentirme mejor y entrenar desde casa."></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-4">
+                            <label class="form-label fw-bold">Fecha inicio</label>
+                            <input type="date" name="FechaInicio" class="form-control" required />
+                        </div>
+
+                        <div class="col-md-4 mb-4">
+                            <label class="form-label fw-bold">Fecha meta</label>
+                            <input type="date" name="FechaMeta" class="form-control" required />
+                        </div>
+
+                        <div class="col-md-4 mb-4">
+                            <label class="form-label fw-bold">Prioridad</label>
+                            <select name="Prioridad" class="form-select">
+                                <option value="Baja">Baja</option>
+                                <option value="Media" selected>Media</option>
+                                <option value="Alta">Alta</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="form-label fw-bold">Meta específica</label>
+                        <input type="text"
+                               name="MetaEspecifica"
+                               class="form-control"
+                               placeholder="Ejemplo: bajar 10 libras, entrenar 4 días por semana, definir abdomen..." />
+                    </div>
+
+                </div>
+
+                <div class="footer">
+                    <a href="/Usuario/Objetivos" class="btn btn-light">Cancelar</a>
+
+                    <button class="btn btn-success">
+                        <i class="bi bi-check-lg"></i> Guardar objetivo
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,372 @@
+﻿@using Microsoft.AspNetCore.Http
+
+@{
+    Layout = null;
+    var nombreUsuario = Context.Session.GetString("NombreUsuario") ?? "Usuario";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Menú Principal - PropósitoFit</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --verde: #39b72f;
+            --verde-oscuro: #1f7a1f;
+            --negro: #05080d;
+            --blanco: #ffffff;
+            --gris: #d1d5db;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: var(--blanco);
+            background: var(--negro);
+            overflow: hidden;
+        }
+
+        .layout {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, #020617, #08111f);
+            border-right: 1px solid rgba(255,255,255,.10);
+            padding: 18px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 22px;
+        }
+
+            .logo img {
+                width: 75px;
+                margin-bottom: 5px;
+            }
+
+            .logo h2 {
+                margin: 0;
+                font-size: 28px;
+                font-weight: 800;
+            }
+
+            .logo span,
+            .hero h1 span {
+                color: var(--verde);
+            }
+
+        .menu-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 18px;
+            margin-bottom: 9px;
+            border-radius: 14px;
+            color: var(--blanco);
+            text-decoration: none;
+            font-size: 18px;
+            transition: .2s;
+        }
+
+            .menu-link i {
+                font-size: 25px;
+                width: 28px;
+                text-align: center;
+            }
+
+            .menu-link:hover,
+            .menu-link.active {
+                background: linear-gradient(90deg, var(--verde-oscuro), var(--verde));
+                color: var(--blanco);
+                transform: translateX(4px);
+            }
+
+        .sidebar-footer {
+            position: relative;
+            margin-top: 18px;
+            text-align: center;
+            color: var(--gris);
+            font-size: 15px;
+            padding-bottom: 10px;
+        }
+
+            .sidebar-footer i {
+                color: var(--verde);
+                font-size: 30px;
+                display: block;
+                margin-bottom: 8px;
+            }
+
+        .main {
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,.72), rgba(0,0,0,.82)), url('/images/login-bg.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .topbar {
+            height: 88px;
+            padding: 18px 45px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 25px;
+            background: rgba(0,0,0,.38);
+            border-bottom: 1px solid rgba(255,255,255,.12);
+            backdrop-filter: blur(8px);
+        }
+
+        .bell {
+            font-size: 28px;
+            position: relative;
+        }
+
+            .bell::after {
+                content: "";
+                width: 9px;
+                height: 9px;
+                background: var(--verde);
+                border-radius: 50%;
+                position: absolute;
+                top: 0;
+                right: -2px;
+            }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 21px;
+            white-space: nowrap;
+        }
+
+        .user-icon {
+            width: 55px;
+            height: 55px;
+            border: 3px solid var(--verde);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(57,183,47,.12);
+        }
+
+            .user-icon i {
+                font-size: 32px;
+            }
+
+        .hero {
+            height: calc(100vh - 88px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .hero-box {
+            width: 100%;
+            max-width: 1000px;
+            padding: 70px 60px;
+            border-radius: 30px;
+            background: rgba(0,0,0,.55);
+            border: 1px solid rgba(255,255,255,.10);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 50px rgba(0,0,0,.40);
+        }
+
+        .hero h1 {
+            font-size: clamp(48px, 6vw, 76px);
+            font-weight: 900;
+            margin: 0;
+        }
+
+        .line {
+            width: 85px;
+            height: 5px;
+            background: var(--verde);
+            margin: 20px auto;
+            border-radius: 10px;
+        }
+
+        .hero h2 {
+            font-size: clamp(30px, 3.6vw, 44px);
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .hero p {
+            font-size: clamp(19px, 2.2vw, 25px);
+            color: #f3f4f6;
+            margin-bottom: 0;
+        }
+
+            .hero p span {
+                color: var(--verde);
+                font-weight: 800;
+            }
+
+        @@media (max-width: 992px) {
+            body {
+                overflow: auto;
+            }
+
+            .layout {
+                display: block;
+                height: auto;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 18px;
+            }
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+                height: auto;
+                min-height: 100vh;
+            }
+
+            .topbar {
+                justify-content: center;
+                padding: 18px;
+            }
+
+            .user-info {
+                font-size: 18px;
+            }
+
+            .hero {
+                height: auto;
+                min-height: calc(100vh - 88px);
+                padding: 30px 15px;
+            }
+
+            .hero-box {
+                padding: 45px 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="layout">
+
+        <aside class="sidebar">
+
+            <div class="logo">
+                <img src="/images/logo.png" alt="Logo PropósitoFit" />
+                <h2>Propósito<span>Fit</span></h2>
+            </div>
+
+            <a href="/Usuario/Index" class="menu-link active">
+                <i class="bi bi-house-door"></i>
+                Inicio
+            </a>
+
+            <a href="/Usuario/Objetivos" class="menu-link">
+                <i class="bi bi-bullseye"></i>
+                Mis Objetivos
+            </a>
+
+            <a href="/Usuario/Rutinas" class="menu-link">
+                <i class="bi bi-activity"></i>
+                Rutinas
+            </a>
+
+            <a href="/Usuario/Alimentacion" class="menu-link">
+                <i class="bi bi-egg-fried"></i>
+                Alimentación
+            </a>
+
+            <a href="/Usuario/Progreso" class="menu-link">
+                <i class="bi bi-graph-up-arrow"></i>
+                Mi Progreso
+            </a>
+
+            <a href="/Usuario/MiPerfil" class="menu-link">
+                <i class="bi bi-person"></i>
+                Mi Perfil
+            </a>
+
+            <hr style="border-color: rgba(255,255,255,.18);" />
+
+            <a href="/Acceso/CerrarSesion" class="menu-link">
+                <i class="bi bi-box-arrow-left"></i>
+                Cerrar Sesión
+            </a>
+
+            <div class="sidebar-footer">
+                <i class="bi bi-heart-pulse"></i>
+                Planifica, entrena<br />
+                y alcanza <span style="color:#39b72f;">tus objetivos.</span>
+            </div>
+
+        </aside>
+
+        <main class="main">
+
+            <div class="topbar">
+
+                <i class="bi bi-bell bell"></i>
+
+                <div class="user-info">
+                    <div class="user-icon">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+
+                    <span>Hola, @nombreUsuario</span>
+                    <i class="bi bi-chevron-down"></i>
+                </div>
+
+            </div>
+
+            <section class="hero">
+
+                <div class="hero-box">
+
+                    <h1>Propósito<span>Fit</span></h1>
+
+                    <div class="line"></div>
+
+                    <h2>¡Bienvenido, @nombreUsuario!</h2>
+
+                    <p>
+                        Tu espacio personal para gestionar<br />
+                        <span>entrenamientos, alimentación y progreso físico.</span>
+                    </p>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+</body>
+</html>

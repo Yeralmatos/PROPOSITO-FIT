@@ -1,0 +1,63 @@
+﻿@model PropositoFit.Models.Rutina
+
+@{
+    ViewData["Title"] = "Editar Rutina";
+}
+
+<h2>Editar Rutina</h2>
+
+<form asp-action="EditarRutina" method="post">
+
+    <input asp-for="Id" type="hidden" />
+
+    <div class="mb-3">
+        <label>Objetivo</label>
+        <select asp-for="ObjetivoId" class="form-control">
+            @foreach (var objetivo in ViewBag.Objetivos)
+            {
+                <option value="@objetivo.Id">@objetivo.Nombre</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Nombre</label>
+        <input asp-for="Nombre" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Descripción</label>
+        <textarea asp-for="Descripcion" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label>Nivel</label>
+        <select asp-for="Nivel" class="form-control">
+            <option value="Principiante">Principiante</option>
+            <option value="Intermedio">Intermedio</option>
+            <option value="Avanzado">Avanzado</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Estado</label>
+        <select asp-for="Estado" class="form-control">
+            <option value="Activa">Activa</option>
+            <option value="Inactiva">Inactiva</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Instrucciones</label>
+        <textarea asp-for="Instrucciones" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Guardar Cambios
+    </button>
+
+    <a asp-action="Rutinas" class="btn btn-secondary">
+        Cancelar
+    </a>
+
+</form>

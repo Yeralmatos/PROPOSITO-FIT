@@ -1,0 +1,408 @@
+﻿@using Microsoft.AspNetCore.Http
+@using PropositoFit.Models
+
+@{
+    Layout = null;
+    var nombreUsuario = Context.Session.GetString("NombreUsuario") ?? "Usuario";
+    var objetivoActual = ViewBag.ObjetivoActual as string ?? "Sin objetivo";
+    bool sinObjetivo = ViewBag.SinObjetivo ?? true;
+
+    var desayunos = ViewBag.Desayunos as List<Alimentacion> ?? new List<Alimentacion>();
+    var almuerzos = ViewBag.Almuerzos as List<Alimentacion> ?? new List<Alimentacion>();
+    var cenas = ViewBag.Cenas as List<Alimentacion> ?? new List<Alimentacion>();
+    var meriendas = ViewBag.Meriendas as List<Alimentacion> ?? new List<Alimentacion>();
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>Alimentación - PropósitoFit</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            background: #f7f8fb;
+            font-family: Arial,sans-serif;
+            color: #111827;
+        }
+
+        .sidebar {
+            width: 240px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background: #071426;
+            color: white;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: 800;
+            margin-bottom: 32px;
+        }
+
+            .logo span {
+                color: #24c932;
+            }
+
+        .menu {
+            flex: 1;
+        }
+
+        .menu-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: white;
+            text-decoration: none;
+            padding: 12px 14px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+            .menu-link i {
+                font-size: 19px;
+                width: 22px;
+            }
+
+            .menu-link.active, .menu-link:hover {
+                background: #10b62f;
+                color: white;
+            }
+
+        .motivacion {
+            margin-top: auto;
+            background: rgba(255,255,255,.08);
+            border-radius: 16px;
+            padding: 16px 12px;
+            text-align: center;
+        }
+
+        .content {
+            margin-left: 240px;
+            padding: 0 26px 28px;
+        }
+
+        .topbar {
+            height: 72px;
+            background: white;
+            margin: 0 -26px 20px;
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 12px rgba(0,0,0,.05);
+        }
+
+        .card-box {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 22px;
+            box-shadow: 0 6px 20px rgba(0,0,0,.04);
+        }
+
+        .objective-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 18px;
+            background: #0ca52d;
+            color: white;
+            font-size: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            border: 0;
+            background: #f1f5f9;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            width: 100%;
+        }
+
+            .tab-btn.active {
+                background: #0ca52d;
+                color: white;
+            }
+
+        .option-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 16px;
+            background: #fff;
+            height: 100%;
+        }
+
+            .option-card h6 {
+                min-height: 38px;
+            }
+
+        .macro {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+
+        .empty-state {
+            background: white;
+            border-radius: 20px;
+            padding: 60px;
+            text-align: center;
+            border: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="logo">Propósito<span>Fit</span></div>
+
+        <div class="menu">
+            <a href="/Usuario/Index" class="menu-link"><i class="bi bi-house-door"></i> Inicio</a>
+            <a href="/Usuario/Objetivos" class="menu-link"><i class="bi bi-bullseye"></i> Mis Objetivos</a>
+            <a href="/Usuario/Rutinas" class="menu-link"><i class="bi bi-activity"></i> Rutinas</a>
+            <a href="/Usuario/Alimentacion" class="menu-link active"><i class="bi bi-apple"></i> Alimentación</a>
+            <a href="/Usuario/Progreso" class="menu-link"><i class="bi bi-graph-up"></i> Mi Progreso</a>
+            <a href="/Usuario/MiPerfil" class="menu-link"><i class="bi bi-person"></i> Mi Perfil</a>
+            <a href="/Acceso/CerrarSesion" class="menu-link"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a>
+        </div>
+
+        <div class="motivacion">
+            <div style="font-size:28px;">🏆</div>
+            <h6 class="fw-bold mt-2">¡Sigue así!</h6>
+            <p class="mb-2 small">La constancia hoy,<br />son los resultados mañana.</p>
+            <div style="font-size:22px;color:#20c431;">♥</div>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <div class="topbar">
+            <h3 class="fw-bold mb-0">
+                <i class="bi bi-list me-3"></i> Alimentación
+            </h3>
+
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-bell fs-4"></i>
+                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width:43px;height:43px;">
+                    <i class="bi bi-person-fill fs-4 text-secondary"></i>
+                </div>
+                <strong>Hola, @nombreUsuario</strong>
+                <i class="bi bi-chevron-down"></i>
+            </div>
+        </div>
+
+        <div class="card-box mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-4">
+                    <div class="objective-icon">
+                        <i class="bi bi-bullseye"></i>
+                    </div>
+
+                    <div>
+                        <h5 class="text-success fw-bold mb-1">Objetivo actual</h5>
+                        <h2 class="fw-bold mb-1">@objetivoActual</h2>
+                        <p class="mb-0 text-muted">Recomendaciones alimenticias según tu objetivo físico.</p>
+                    </div>
+                </div>
+
+                <div style="font-size:70px;">🥗</div>
+            </div>
+        </div>
+
+        @if (sinObjetivo)
+        {
+            <div class="empty-state">
+                <div style="font-size:65px;">🎯</div>
+                <h3 class="fw-bold mt-3">No has seleccionado un objetivo</h3>
+                <p class="text-muted">
+                    Para recibir opciones de alimentación personalizadas, primero debes seleccionar un objetivo.
+                </p>
+                <a href="/Usuario/Objetivos" class="btn btn-success px-4">
+                    Ir a Mis Objetivos
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="card-box mb-4">
+                <h4 class="fw-bold mb-3">Opciones de comidas</h4>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <button class="tab-btn active" onclick="mostrarOpciones('desayunos', this)">
+                            <i class="bi bi-sun me-2"></i>Desayunos
+                        </button>
+                    </div>
+
+                    <div class="col-md-3">
+                        <button class="tab-btn" onclick="mostrarOpciones('almuerzos', this)">
+                            <i class="bi bi-egg-fried me-2"></i>Almuerzos
+                        </button>
+                    </div>
+
+                    <div class="col-md-3">
+                        <button class="tab-btn" onclick="mostrarOpciones('cenas', this)">
+                            <i class="bi bi-moon-stars me-2"></i>Cenas
+                        </button>
+                    </div>
+
+                    <div class="col-md-3">
+                        <button class="tab-btn" onclick="mostrarOpciones('meriendas', this)">
+                            <i class="bi bi-apple me-2"></i>Meriendas
+                        </button>
+                    </div>
+                </div>
+
+                <div id="desayunos" class="opciones row g-3">
+                    @foreach (var item in desayunos)
+                    {
+                        <div class="col-md-3">
+                            <div class="option-card">
+                                <h6 class="fw-bold">@item.Nombre</h6>
+                                <p class="text-muted">@item.Descripcion</p>
+                                <p class="macro">🔥 @item.Calorias kcal</p>
+                                <p class="macro">Proteínas: @item.Proteinas g</p>
+                                <p class="macro">Carbohidratos: @item.Carbohidratos g</p>
+                                <p class="macro">Grasas: @item.Grasas g</p>
+
+                                <button class="btn btn-outline-success w-100"
+                                        onclick="seleccionarComida(@item.Id, '@item.Nombre', @item.Calorias)">
+                                    Seleccionar
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div id="almuerzos" class="opciones row g-3 d-none">
+                    @foreach (var item in almuerzos)
+                    {
+                        <div class="col-md-3">
+                            <div class="option-card">
+                                <h6 class="fw-bold">@item.Nombre</h6>
+                                <p class="text-muted">@item.Descripcion</p>
+                                <p class="macro">🔥 @item.Calorias kcal</p>
+                                <p class="macro">Proteínas: @item.Proteinas g</p>
+                                <p class="macro">Carbohidratos: @item.Carbohidratos g</p>
+                                <p class="macro">Grasas: @item.Grasas g</p>
+
+                                <button class="btn btn-outline-success w-100"
+                                        onclick="seleccionarComida(@item.Id, '@item.Nombre', @item.Calorias)">
+                                    Seleccionar
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div id="cenas" class="opciones row g-3 d-none">
+                    @foreach (var item in cenas)
+                    {
+                        <div class="col-md-3">
+                            <div class="option-card">
+                                <h6 class="fw-bold">@item.Nombre</h6>
+                                <p class="text-muted">@item.Descripcion</p>
+                                <p class="macro">🔥 @item.Calorias kcal</p>
+                                <p class="macro">Proteínas: @item.Proteinas g</p>
+                                <p class="macro">Carbohidratos: @item.Carbohidratos g</p>
+                                <p class="macro">Grasas: @item.Grasas g</p>
+
+                                <button class="btn btn-outline-success w-100"
+                                        onclick="seleccionarComida(@item.Id, '@item.Nombre', @item.Calorias)">
+                                    Seleccionar
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div id="meriendas" class="opciones row g-3 d-none">
+                    @foreach (var item in meriendas)
+                    {
+                        <div class="col-md-3">
+                            <div class="option-card">
+                                <h6 class="fw-bold">@item.Nombre</h6>
+                                <p class="text-muted">@item.Descripcion</p>
+                                <p class="macro">🔥 @item.Calorias kcal</p>
+                                <p class="macro">Proteínas: @item.Proteinas g</p>
+                                <p class="macro">Carbohidratos: @item.Carbohidratos g</p>
+                                <p class="macro">Grasas: @item.Grasas g</p>
+
+                                <button class="btn btn-outline-success w-100"
+                                        onclick="seleccionarComida(@item.Id, '@item.Nombre', @item.Calorias)">
+                                    Seleccionar
+                                </button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="card-box">
+                <h4 class="fw-bold mb-3">Registrar alimentación diaria</h4>
+
+                <form method="post" action="/Usuario/GuardarRegistroAlimentacion">
+                    <input type="hidden" id="alimentacionId" name="alimentacionId" />
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Comida consumida</label>
+                            <input type="text" id="comida" name="comida" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Calorías aproximadas</label>
+                            <input type="number" id="calorias" name="calorias" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Agua consumida (litros)</label>
+                            <input type="number" step="0.1" name="agua" class="form-control" placeholder="Ej: 2.5" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success px-4">
+                        <i class="bi bi-save me-2"></i>Guardar Registro
+                    </button>
+                </form>
+            </div>
+        }
+
+    </div>
+
+    <script>
+        function mostrarOpciones(id, boton) {
+            document.querySelectorAll(".opciones").forEach(x => x.classList.add("d-none"));
+            document.getElementById(id).classList.remove("d-none");
+
+            document.querySelectorAll(".tab-btn").forEach(x => x.classList.remove("active"));
+            boton.classList.add("active");
+        }
+
+        function seleccionarComida(id, nombre, calorias) {
+            document.getElementById("alimentacionId").value = id;
+            document.getElementById("comida").value = nombre;
+            document.getElementById("calorias").value = calorias;
+
+            window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+        }
+    </script>
+
+</body>
+</html>
+

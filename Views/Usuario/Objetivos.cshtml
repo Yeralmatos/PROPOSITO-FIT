@@ -1,0 +1,290 @@
+﻿@using Microsoft.AspNetCore.Http
+@using PropositoFit.Models
+@model List<PropositoFit.Models.Objetivo>
+
+@{
+    Layout = null;
+    var nombreUsuario = Context.Session.GetString("NombreUsuario") ?? "Usuario";
+
+    var objetivoActual = ViewBag.ObjetivoActual as Objetivo;
+    var objetivoUsuario = ViewBag.ObjetivoUsuario as UsuarioObjetivo;
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <title>Mis Objetivos - PropósitoFit</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            background: #f7f8fb;
+            font-family: Arial, sans-serif;
+            color: #111827;
+        }
+
+        .sidebar {
+            width: 240px;
+            height: 100vh;
+            position: fixed;
+            background: #071426;
+            color: white;
+            padding: 24px 16px;
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: 800;
+            margin-bottom: 38px;
+        }
+
+            .logo span {
+                color: #24c932;
+            }
+
+        .menu-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: white;
+            text-decoration: none;
+            padding: 14px 15px;
+            border-radius: 12px;
+            margin-bottom: 11px;
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+            .menu-link.active,
+            .menu-link:hover {
+                background: #10b62f;
+                color: white;
+            }
+
+        .content {
+            margin-left: 240px;
+            padding: 0 26px 28px;
+        }
+
+        .topbar {
+            height: 72px;
+            background: white;
+            margin: 0 -26px 20px;
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 12px rgba(0,0,0,.05);
+        }
+
+        .card-box {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 6px 20px rgba(0,0,0,.04);
+        }
+
+        .objective-icon {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            background: #0ca52d;
+            color: white;
+            font-size: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-input {
+            height: 58px;
+            font-size: 17px;
+        }
+
+        .result-item {
+            background: white;
+            border-radius: 16px;
+            padding: 18px 22px;
+            margin-bottom: 14px;
+            box-shadow: 0 5px 18px rgba(0,0,0,.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-icon {
+            font-size: 32px;
+            color: #198754;
+            margin-right: 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="logo">Propósito<span>Fit</span></div>
+
+        <a href="/Usuario/Index" class="menu-link">🏠 Inicio</a>
+        <a href="/Usuario/Objetivos" class="menu-link active">🎯 Mis Objetivos</a>
+        <a href="/Usuario/Rutinas" class="menu-link">🏋️ Rutinas</a>
+        <a href="/Usuario/Alimentacion" class="menu-link">🍎 Alimentación</a>
+        <a href="/Usuario/Progreso" class="menu-link">📈 Mi Progreso</a>
+        <a href="/Usuario/MiPerfil" class="menu-link">👤 Mi Perfil</a>
+        <a href="/Acceso/CerrarSesion" class="menu-link">🚪 Cerrar Sesión</a>
+    </div>
+
+    <div class="content">
+
+        <div class="topbar">
+            <h3 class="fw-bold mb-0">
+                <i class="bi bi-list me-3"></i> Mis Objetivos
+            </h3>
+
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-bell fs-4"></i>
+                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width:43px;height:43px;">
+                    <i class="bi bi-person-fill fs-4 text-secondary"></i>
+                </div>
+                <strong>Hola, @nombreUsuario</strong>
+            </div>
+        </div>
+
+        @if (objetivoActual != null)
+        {
+            <div class="card-box mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-4">
+                        <div class="objective-icon">
+                            <i class="bi bi-bullseye"></i>
+                        </div>
+
+                        <div>
+                            <h5 class="text-success fw-bold mb-1">Objetivo seleccionado</h5>
+                            <h2 class="fw-bold mb-1">@objetivoActual.Nombre</h2>
+                            <p class="mb-2 text-muted">@objetivoActual.Descripcion</p>
+
+                            @if (objetivoUsuario != null)
+                            {
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge bg-light text-dark border">
+                                        Inicio: @objetivoUsuario.FechaInicio.ToString("dd/MM/yyyy")
+                                    </span>
+
+                                    <span class="badge bg-light text-dark border">
+                                        Meta: @objetivoUsuario.FechaMeta.ToString("dd/MM/yyyy")
+                                    </span>
+
+                                    <span class="badge bg-light text-dark border">
+                                        Prioridad: @objetivoUsuario.Prioridad
+                                    </span>
+
+                                    @if (!string.IsNullOrWhiteSpace(objetivoUsuario.MetaEspecifica))
+                                    {
+                                        <span class="badge bg-success">
+                                            @objetivoUsuario.MetaEspecifica
+                                        </span>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <form method="post" action="/Usuario/EliminarObjetivoActual"
+                          onsubmit="return confirm('¿Seguro que deseas eliminar este objetivo actual?');">
+                        <button class="btn btn-outline-danger">
+                            <i class="bi bi-trash"></i> Eliminar objetivo
+                        </button>
+                    </form>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning p-4 rounded-4">
+                Todavía no tienes un objetivo seleccionado.
+            </div>
+        }
+
+        <div class="card-box mb-4">
+            <h2 class="fw-bold mb-1">Buscar nuevo objetivo</h2>
+            <p class="text-muted mb-4">Escribe lo que deseas trabajar en casa.</p>
+
+            <div class="input-group">
+                <span class="input-group-text bg-white">
+                    <i class="bi bi-search text-success fs-4"></i>
+                </span>
+
+                <input type="text"
+                       id="buscadorObjetivo"
+                       class="form-control search-input"
+                       placeholder="Ejemplo: bajar peso, abdomen, glúteos, resistencia..."
+                       autocomplete="off" />
+            </div>
+
+            <small class="text-muted d-block mt-2">
+                Los resultados aparecerán automáticamente mientras escribes.
+            </small>
+        </div>
+
+        <div id="resultadosObjetivos"></div>
+
+    </div>
+
+    <script>
+        const input = document.getElementById("buscadorObjetivo");
+        const contenedor = document.getElementById("resultadosObjetivos");
+
+        input.addEventListener("input", function () {
+            const texto = input.value.trim();
+
+            if (texto.length < 2) {
+                contenedor.innerHTML = "";
+                return;
+            }
+
+            fetch(`/Usuario/BuscarObjetivosAjax?termino=${encodeURIComponent(texto)}`)
+                .then(response => response.json())
+                .then(data => {
+                    contenedor.innerHTML = "";
+
+                    if (!data || data.length === 0) {
+                        contenedor.innerHTML = `
+                            <div class="alert alert-warning text-center p-4">
+                                No se encontraron objetivos relacionados.
+                            </div>`;
+                        return;
+                    }
+
+                    data.forEach(item => {
+                        contenedor.innerHTML += `
+                            <div class="result-item">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-bullseye result-icon"></i>
+
+                                    <div>
+                                        <h5 class="fw-bold mb-1">${item.nombre}</h5>
+                                        <p class="text-muted mb-0">${item.descripcion ?? ""}</p>
+                                    </div>
+                                </div>
+
+                                <form method="post" action="/Usuario/SeleccionarObjetivo">
+                                    <input type="hidden" name="id" value="${item.id}" />
+                                    <button class="btn btn-success">
+                                        Seleccionar
+                                    </button>
+                                </form>
+                            </div>`;
+                    });
+                });
+        });
+    </script>
+
+</body>
+</html>
+
