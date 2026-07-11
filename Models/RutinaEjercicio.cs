@@ -14,7 +14,7 @@ namespace PropositoFit.Models
         public int Orden { get; set; }
 
         // Configuración del ejercicio
-        public int Series { get; set; }
+        public int Series { get; set; } 
 
         public int Repeticiones { get; set; }
 

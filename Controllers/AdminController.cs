@@ -79,7 +79,7 @@ namespace PropositoFit.Controllers
             usuarioBD.Cedula = usuario.Cedula;
             usuarioBD.Correo = usuario.Correo;
             usuarioBD.Contrasena = usuario.Contrasena;
-            usuarioBD.Edad = usuario.Edad;
+            usuarioBD.FechaNacimiento = usuario.FechaNacimiento;
             usuarioBD.Sexo = usuario.Sexo;
             usuarioBD.Peso = usuario.Peso;
             usuarioBD.Estatura = usuario.Estatura;
