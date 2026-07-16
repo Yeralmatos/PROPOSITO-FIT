@@ -31,5 +31,34 @@ namespace PropositoFit.Data
         public DbSet<EjercicioCompletado> EjerciciosCompletados { get; set; }
 
         public DbSet<Progreso> Progresos { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // ===========================
+            // TABLA USUARIOS
+            // ===========================
+
+            modelBuilder.Entity<Usuario>()
+                .HasIndex(u => u.Correo)
+                .IsUnique();
+
+            modelBuilder.Entity<Usuario>()
+                .HasIndex(u => u.NombreUsuario)
+                .IsUnique();
+
+            modelBuilder.Entity<Usuario>()
+                .Property(u => u.Estado)
+                .HasDefaultValue("Activo");
+
+            modelBuilder.Entity<Usuario>()
+                .Property(u => u.Rol)
+                .HasDefaultValue("Cliente");
+
+            modelBuilder.Entity<Usuario>()
+                .Property(u => u.FechaRegistro)
+                .HasDefaultValueSql("GETDATE()");
+        }
     }
 }

@@ -75,7 +75,8 @@ namespace PropositoFit.Controllers
             var usuarioBD = _context.Usuarios.FirstOrDefault(u => u.Id == usuario.Id);
             if (usuarioBD == null) return RedirectToAction("Usuarios");
 
-            usuarioBD.Nombre = usuario.Nombre;
+            usuarioBD.NombreCliente = usuario.NombreCliente;
+            usuarioBD.NombreUsuario = usuario.NombreUsuario;
             usuarioBD.Cedula = usuario.Cedula;
             usuarioBD.Correo = usuario.Correo;
             usuarioBD.Contrasena = usuario.Contrasena;

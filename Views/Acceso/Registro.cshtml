@@ -195,6 +195,13 @@
             <div class="mensaje">
                 <h2>Comienza tu cambio físico desde hoy.</h2>
 
+                @if (TempData["Exito"] != null)
+                {
+                    <div class="alert alert-success mt-3">
+                        @TempData["Exito"]
+                    </div>
+                }
+
                 <p>
                     Crea tu perfil, registra tus datos físicos y recibe rutinas
                     adaptadas a tus objetivos: perder peso, ganar masa muscular,
@@ -243,18 +250,31 @@
                       method="post">
 
                     @Html.AntiForgeryToken()
-
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
                     <div class="row">
 
                         <div class="col-md-6 mb-3">
-                            <label for="Nombre">Nombre completo</label>
+                            <label for="NombreCliente">Nombre del cliente</label>
 
                             <input type="text"
-                                   id="Nombre"
-                                   name="Nombre"
+                                   id="NombreCliente"
+                                   name="NombreCliente"
                                    class="form-control"
-                                   value="@Model?.Nombre"
-                                   placeholder="Ej: Yeral Matos"
+                                   value="@Model?.NombreCliente"
+                                   placeholder="Ej: Rafael Pérez"
+                                   required>
+                        </div>
+
+
+                        <div class="col-md-6 mb-3">
+                            <label for="NombreUsuario">Nombre de usuario</label>
+
+                            <input type="text"
+                                   id="NombreUsuario"
+                                   name="NombreUsuario"
+                                   class="form-control"
+                                   value="@Model?.NombreUsuario"
+                                   placeholder="Ej: rafael23"
                                    required>
                         </div>
 
@@ -331,11 +351,14 @@
                                     required>
 
                                 <option value="">Seleccionar</option>
-                                <option value="Masculino">Masculino</option>
-                                <option value="Femenino">Femenino</option>
-                            </select>
-                        </div>
+                                <option value="M">Masculino</option>
+                                <option value="F">Femenino</option>
+                                <option value="Otro">Otro</option>
 
+                            </select>
+
+                            <span asp-validation-for="Sexo" class="text-danger"></span>
+                        </div>
                         <div class="col-md-6 mb-3">
                             <label for="Peso">Peso actual (kg)</label>
 
@@ -365,7 +388,12 @@
                         </div>
 
                     </div>
-
+                    <div class="mb-3 d-flex justify-content-center">
+                        <div class="g-recaptcha"
+                             data-sitekey="@ViewBag.SiteKey">
+                        </div>
+                   
+                    </div>
                     <button type="submit"
                             class="btn btn-success btn-crear w-100 mt-2">
                         Crear cuenta
@@ -388,6 +416,6 @@
         </section>
 
     </div>
-
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </body>
 </html>
