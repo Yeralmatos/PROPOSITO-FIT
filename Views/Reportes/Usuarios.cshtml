@@ -1,0 +1,90 @@
+@model PropositoFit.Models.ReporteUsuarioViewModel
+
+@{
+    ViewData["Title"] = "Reporte de Usuarios";
+}
+
+<div class="container mt-4">
+    <h2>Panel Administrador - Reporte de Usuarios</h2>
+    <hr />
+
+    <!-- Formulario de Filtros por Fecha -->
+    <form method="get" asp-controller="Reportes" asp-action="Usuarios" class="row g-3 mb-4 card p-3 shadow-sm">
+        <div class="col-md-4">
+            <label class="form-label fw-bold">Fecha Desde:</label>
+            <input type="date" name="fechaInicio" class="form-control" value="@Model.FechaInicio.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-bold">Fecha Hasta:</label>
+            <input type="date" name="fechaFin" class="form-control" value="@Model.FechaFin.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">Filtrar Reporte</button>
+        </div>
+    </form>
+
+    <!-- Tarjetas de Resumen (KPIs) -->
+    <div class="row mb-4">
+        <div class="col-md-6 mb-2">
+            <div class="card text-white bg-info shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Total Usuarios Registrados</h5>
+                    <h3 class="display-6">@Model.TotalUsuarios</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-2">
+            <div class="card text-white bg-success shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Usuarios Activos</h5>
+                    <h3 class="display-6">@Model.UsuariosActivos</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Detalles -->
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-striped table-hover mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Fecha Registro</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.DetalleUsuarios.Any())
+                {
+                    @foreach (var user in Model.DetalleUsuarios)
+                    {
+                        <tr>
+                            <td>@user.Id</td>
+                            <td>@user.Nombre</td>
+                            <td>@user.Email</td>
+                            <td>@user.FechaRegistro.ToString("dd/MM/yyyy")</td>
+                            <td>
+                                @if (user.Estado == "Activo")
+                                {
+                                    <span class="badge bg-success">Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Inactivo</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">No se encontraron registros en el rango de fechas seleccionado.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
